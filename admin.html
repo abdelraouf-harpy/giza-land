@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="mainHtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giza Land | لوحة تحكم الإدارة</title>
+    <!-- CSS & Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=3.5.0">
+    <link rel="icon" type="image/png" href="logo.png">
+    
+    <style>
+        /* Loading Overlay before auth check */
+        #auth-overlay {
+            position: fixed; inset: 0; background: #0f172a; z-index: 99999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white; font-family: 'Cairo', sans-serif; gap: 20px;
+        }
+    </style>
+</head>
+<body class="rtl">
+
+<!-- Auth Loading Shield -->
+<div id="auth-overlay">
+    <div class="spinner" style="width: 50px; height: 50px; border-width: 4px; border-top-color: var(--accent);"></div>
+    <h3 style="font-weight: 800; font-size: 1.2rem;">جاري التحقق من صلاحيات الدخول...</h3>
+</div>
+
+<!-- Mobile Menu Header -->
+<div class="admin-mob-header">
+    <div style="display:flex; align-items:center; gap:10px;">
+        <img src="logo.png" style="height:32px;">
+        <span style="font-weight:900; font-size:1.1rem; color:var(--primary);">GIZA<span>LAND</span></span>
+    </div>
+    <button class="admin-mob-btn" onclick="toggleAdminSidebar()"><i class="fa fa-bars"></i></button>
+</div>
+
+<div class="admin-layout">
+    
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="admin-brand">
+            GIZA<span>LAND</span> <span style="font-size: 11px; display:block; opacity:0.7; font-weight:700; margin-top:4px;">لوحة تحكم الإدارة</span>
+        </div>
+        
+        <div class="admin-menu">
+            <button class="admin-menu-btn active" id="btnSecStats" onclick="showAdminSection('stats')">
+                <i class="fa fa-chart-line"></i> الإحصائيات العامة
+            </</button>
+            <button class="admin-menu-btn" id="btnSecActive" onclick="showAdminSection('active')">
+                <i class="fa fa-home"></i> العقارات النشطة
+            </button>
+            <button class="admin-menu-btn" id="btnSecPending" onclick="showAdminSection('pending')">
+                <i class="fa fa-clock"></i> طلبات المراجعة
+                <span id="pendingBadge" style="background:#ef4444; color:white; font-size:10px; padding:2px 6px; border-radius:50px; margin-inline-start:auto; display:none;">0</span>
+            </button>
+            <button class="admin-menu-btn" id="btnSecAdd" onclick="openAddAdminForm()">
+                <i class="fa fa-plus-circle"></i> إضافة عقار جديد
+            </button>
+            
+            <a href="index.html" class="admin-menu-btn" style="text-decoration:none;">
+                <i class="fa fa-external-link-alt"></i> الانتقال للموقع
+            </a>
+            
+            <button class="admin-menu-btn logout" onclick="handleAdminLogout()">
+                <i class="fa fa-sign-out-alt"></i> تسجيل الخروج
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        
+        <!-- Header -->
+        <header class="admin-header" style="background:transparent; padding:0; border:none; box-shadow:none; position:static;">
+            <div class="admin-header-title">
+                <h2 id="adminWelcomeTitle">مرحباً، الأدمن</h2>
+                <p>إدارة كاملة لعقارات وطلبات محافظة الجيزة</p>
+            </div>
+            <div style="font-weight:700; color:var(--text-muted); font-size:0.95rem;" id="currentDate">
+                <!-- Date loaded dynamically -->
+            </div>
+        </header>
+
+        <!-- 1. Stats Grid Section -->
+        <section class="admin-section active" id="sec-stats">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>إجمالي العقارات النشطة</h3>
+                        <div class="stat-value" id="statTotalActive">0</div>
+                    </div>
+                    <div class="stat-icon"><i class="fa fa-check-circle"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>طلبات بانتظار الموافقة</h3>
+                        <div class="stat-value" id="statTotalPending" style="color:var(--accent);">0</div>
+                    </div>
+                    <div class="stat-icon"><i class="fa fa-hourglass-half"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>عقارات للبيع</h3>
+                        <div class="stat-value" id="statTotalSale">0</div>
+                    </div>
+                    <div class="stat-icon"><i class="fa fa-tags"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>عقارات للإيجار</h3>
+                        <div class="stat-value" id="statTotalRent">0</div>
+                    </div>
+                    <div class="stat-icon"><i class="fa fa-key"></i></div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;" class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <h3>أحدث طلبات الإضافة المعلقة</h3>
+                    <button class="btn-table-action" onclick="showAdminSection('pending')">عرض الكل</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>الصورة</th>
+                                <th>عنوان العقار</th>
+                                <th>المنطقة</th>
+                                <th>السعر المطلوب</th>
+                                <th>صاحب العقار</th>
+                                <th>رقم الاتصال</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quickPendingTableBody">
+                            <!-- Loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Active Listings Section -->
+        <section class="admin-section" id="sec-active">
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <h3>كل العقارات المنشورة على الموقع</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>الصورة</th>
+                                <th>العنوان</th>
+                                <th>المنطقة</th>
+                                <th>التصنيف</th>
+                                <th>المعاملة</th>
+                                <th>السعر</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activeTableBody">
+                            <!-- Loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Pending Approvals Section -->
+        <section class="admin-section" id="sec-pending">
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <h3>طلبات الملاك والمكاتب العقارية المعلقة</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>الصورة</th>
+                                <th>العنوان</th>
+                                <th>المنطقة</th>
+                                <th>السعر المطلوب</th>
+                                <th>الاسم</th>
+                                <th>رقم الواتساب</th>
+                                <th>الوصف</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingTableBody">
+                            <!-- Loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Add/Edit Property Form -->
+        <section class="admin-section" id="sec-add">
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <h3 id="formSectionTitle">إضافة عقار جديد مباشرة للموقع</h3>
+                    <button class="btn-table-action" onclick="showAdminSection('stats')" id="btnBackToStats">إلغاء</button>
+                </div>
+                
+                <form id="adminPropertyForm" onsubmit="submitAdminForm(event)">
+                    <!-- Hidden field to check if we are editing -->
+                    <input type="hidden" id="editPropertyId">
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="adContactName">اسم المعلن / المكتب العقاري *</label>
+                            <input type="text" id="adContactName" required placeholder="مثلاً: شركة جيزا العقارية">
+                        </div>
+                        <div class="form-group">
+                            <label for="adContactPhone">رقم اتصال الواتساب (بالصيغة الدولية) *</label>
+                            <input type="text" id="adContactPhone" required placeholder="مثلاً: 201113453475" style="direction: ltr; text-align: right;">
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="adTitle">عنوان الإعلان العقاري *</label>
+                            <input type="text" id="adTitle" required placeholder="مثلاً: فيلا فاخرة للبيع بالشيخ زايد صف أول تشطيب ألترا سوبر لوكس">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="adType">نوع المعاملة *</label>
+                            <select id="adType" required>
+                                <option value="sale">للبيع</option>
+                                <option value="rent">للإيجار</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="adCategory">تصنيف العقار *</label>
+                            <select id="adCategory" required>
+                                <!-- Loaded dynamically -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="adLocation">المنطقة الجغرافية بالجيزة *</label>
+                            <select id="adLocation" required>
+                                <!-- Loaded dynamically -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="adPrice">السعر المطلوب (ج.م) *</label>
+                            <input type="number" id="adPrice" required placeholder="مثلاً: 3500000">
+                        </div>
+                        <div class="form-group">
+                            <label for="adArea">المساحة (متر مربع) *</label>
+                            <input type="number" id="adArea" required placeholder="مثلاً: 280">
+                        </div>
+                        <div class="form-group">
+                            <label for="adBeds">عدد الغرف *</label>
+                            <input type="number" id="adBeds" required placeholder="4">
+                        </div>
+                        <div class="form-group">
+                            <label for="adBaths">عدد الحمامات *</label>
+                            <input type="number" id="adBaths" required placeholder="3">
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="adDescription">الوصف التفصيلي للعقار *</label>
+                            <textarea id="adDescription" rows="5" required placeholder="تفاصيل كاملة عن العقار، التشطيب، المرافق، شروط البيع/الإيجار..."></textarea>
+                        </div>
+                        
+                        <!-- Image uploader -->
+                        <div class="form-group full-width">
+                            <label>صور العقار *</label>
+                            <div class="upload-box" onclick="document.getElementById('adImagesInput').click()">
+                                <i class="fa fa-cloud-upload-alt"></i>
+                                <p>اسحب الصور أو اضغط هنا لرفعها (تخزين سحابي مباشر)</p>
+                            </div>
+                            <input type="file" id="adImagesInput" accept="image/*" multiple style="display:none;" onchange="handleAdminImageSelection(event)">
+                            <div class="img-previews-container" id="adImagePreviews"></div>
+                        </div>
+                        
+                        <!-- Map Location Pinpoint -->
+                        <div class="form-group full-width">
+                            <label>حدد موقع العقار الجغرافي على الخريطة (انقر لوضع الدبوس) *</label>
+                            <div id="admin-modal-map" class="modal-map" style="height: 240px;"></div>
+                            <input type="hidden" id="adLat" required>
+                            <input type="hidden" id="adLng" required>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer" style="margin-top: 20px;">
+                        <button type="button" class="btn-modal-action secondary" onclick="showAdminSection('stats')">إلغاء</button>
+                        <button type="submit" class="btn-modal-action primary" id="btnAdminFormSubmit">نشر العقار فوراً</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<div id="toasts"></div>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<!-- Compat Firebase APIs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<!-- Config, Auth, Core Logic -->
+<script src="config.js?v=3.5.0"></script>
+<script src="firebase-config.js?v=3.5.0"></script>
+<script src="admin.js?v=3.5.0"></script>
+
+</body>
+</html>
