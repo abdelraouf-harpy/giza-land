@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!--
+    Giza Land – Property Share Page
+    ================================
+    This page reads ?prop=PROPERTY_ID, fetches the property from Firestore
+    via the public REST API, injects the property image / title into the OG
+    tags, then instantly redirects the visitor to the main site.
+
+    Facebook's crawler follows the <meta http-equiv="refresh"> and will also
+    read the OG tags that are injected by the script *before* the refresh.
+
+    Note: Firestore rules already allow public read of active properties, so
+    no authentication key is needed for the REST call.
+  -->
+
+  <!-- ── Fallback OG tags (shown if JS is disabled / before fetch) ── -->
+  <title>عقار مميز | جيزة لاند</title>
+  <meta name="description"       content="تصفح هذا العقار المميز على منصة جيزة لاند – المنصة العقارية الرائدة في محافظة الجيزة.">
+  <meta property="og:site_name"  content="جيزة لاند | Giza Land">
+  <meta property="og:type"       content="article">
+  <meta property="og:title"      content="عقار مميز | جيزة لاند">
+  <meta property="og:description"content="تصفح هذا العقار المميز على منصة جيزة لاند.">
+  <meta property="og:image"      content="https://gizaland.com/og-image.png">
+  <meta property="og:image:width"  content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url"        content="https://gizaland.com/">
+  <meta name="twitter:card"      content="summary_large_image">
+  <meta name="twitter:image"     content="https://gizaland.com/og-image.png">
+  <meta name="twitter:title"     content="عقار مميز | جيزة لاند">
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      background:#0D0D12;min-height:100vh;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      font-family:'Cairo',sans-serif;color:#fff;gap:16px;
+    }
+    .logo{font-size:1.5rem;font-weight:900;letter-spacing:1px}
+    .logo span{color:#D4AF37}
+    .spinner{
+      width:44px;height:44px;
+      border:3px solid rgba(212,175,55,0.15);
+      border-top-color:#D4AF37;
+      border-radius:50%;animation:spin .8s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    p{color:rgba(255,255,255,0.5);font-size:.88rem}
+  </style>
+</head>
+<body>
+  <div class="logo">GIZA<span>LAND</span></div>
+  <div class="spinner"></div>
+  <p>جاري تحميل تفاصيل العقار…</p>
+
+<script>
+(async function () {
+  // ── Helpers ──────────────────────────────────────────────────────────────
+  const FIREBASE_PROJECT = 'giza-land';
+  const MAIN_SITE        = 'https://gizaland.com';
+  const DEFAULT_IMAGE    = MAIN_SITE + '/og-image.png';
+
+  const LOCATION_AR = {
+    hadayek_ahram:'حدائق الأهرام', sheikh_zayed:'الشيخ زايد',
+    october:'6 أكتوبر', mohandessin:'المهندسين', dokki:'الدقي',
+    haram:'الهرم', faisal:'فيصل', giza_square:'ميدان الجيزة',
+    warraq:'الوراق', imbaba:'إمبابة'
+  };
+  const CATEGORY_AR = {
+    apartment:'شقة سكنية', villa:'فيلا مستقلة', townhouse:'تاون هاوس',
+    office:'مكتب إداري', store:'محل تجاري', building:'عمارة كاملة', land:'أرض فضاء'
+  };
+
+  function setMeta(prop, content) {
+    var el = document.querySelector('[property="'+prop+'"]') ||
+             document.querySelector('[name="'+prop+'"]');
+    if (el) el.setAttribute('content', content);
+  }
+
+  function setAllMeta(title, desc, image, url) {
+    document.title = title;
+    document.querySelector('title').textContent = title;
+    var mDesc = document.querySelector('meta[name="description"]');
+    if (mDesc) mDesc.setAttribute('content', desc);
+    setMeta('og:title',        title);
+    setMeta('og:description',  desc);
+    setMeta('og:image',        image);
+    setMeta('og:url',          url);
+    setMeta('twitter:title',   title);
+    setMeta('twitter:image',   image);
+    setMeta('twitter:description', desc);
+  }
+
+  // ── Read prop ID from URL ─────────────────────────────────────────────────
+  var params = new URLSearchParams(window.location.search);
+  var propId  = params.get('prop');
+
+  if (!propId) {
+    window.location.replace(MAIN_SITE);
+    return;
+  }
+
+  var redirectUrl = MAIN_SITE + '/?prop=' + propId;
+
+  // ── Fetch property from Firestore REST API (public read for active docs) ──
+  try {
+    var apiUrl = 'https://firestore.googleapis.com/v1/projects/' +
+                 FIREBASE_PROJECT +
+                 '/databases/(default)/documents/properties/' + propId;
+
+    var resp = await fetch(apiUrl);
+
+    if (!resp.ok) throw new Error('not found');
+
+    var data = await resp.json();
+    var f    = data.fields || {};
+
+    // Extract string fields from Firestore's typed format
+    function str(field)  { return (f[field] && f[field].stringValue) || ''; }
+    function num(field)  { return (f[field] && (f[field].integerValue || f[field].doubleValue)) || 0; }
+    function arrStr(field) {
+      if (!f[field] || !f[field].arrayValue) return [];
+      var vals = f[field].arrayValue.values || [];
+      return vals.map(function(v){ return v.stringValue || ''; }).filter(Boolean);
+    }
+
+    var title    = str('title')    || 'عقار مميز في الجيزة';
+    var location = str('location') || '';
+    var category = str('category') || '';
+    var type     = str('type')     || 'sale';
+    var price    = num('price');
+    var desc     = str('description');
+    var images   = arrStr('images');
+
+    // Build display strings
+    var regionLabel   = LOCATION_AR[location]  || 'الجيزة';
+    var categoryLabel = CATEGORY_AR[category]  || 'عقار';
+    var typeLabel     = type === 'rent' ? 'للإيجار' : 'للبيع';
+    var priceStr      = price ? Number(price).toLocaleString('ar-EG') + ' ج.م' + (type==='rent'?'/شهر':'') : '';
+
+    var ogTitle = title + (priceStr ? ' – ' + priceStr : '') + ' | جيزة لاند';
+    var ogDesc  = desc
+      ? desc.substring(0, 200)
+      : (categoryLabel + ' ' + typeLabel + ' في ' + regionLabel +
+         '. عمولة ثابتة 1.5% وتوثيق حي بالبطاقة. جيزة لاند.');
+
+    var ogImage = images.length > 0 ? images[0] : DEFAULT_IMAGE;
+
+    // Update all OG/Twitter meta tags so WhatsApp / Telegram / LinkedIn
+    // previews show the property image even on a static host.
+    setAllMeta(ogTitle, ogDesc, ogImage, redirectUrl);
+
+  } catch (err) {
+    // Property not found or network error → just redirect with default image
+    console.warn('Share page fetch failed:', err);
+  }
+
+  // ── Redirect regular visitors immediately (crawlers stop at the meta tags) ─
+  window.location.replace(redirectUrl);
+
+})();
+</script>
+</body>
+</html>
