@@ -5,17 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Giza Land | لوحة تحكم الإدارة</title>
     <!-- CSS & Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=3.5.0">
+    <link rel="stylesheet" href="admin.css?v=3.5.0">
     <link rel="icon" type="image/png" href="logo.png">
     
     <style>
         /* Loading Overlay before auth check */
         #auth-overlay {
-            position: fixed; inset: 0; background: #0f172a; z-index: 99999;
+            position: fixed; inset: 0; background: #0D0D12; z-index: 99999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             color: white; font-family: 'Cairo', sans-serif; gap: 20px;
         }
@@ -25,7 +25,7 @@
 
 <!-- Auth Loading Shield -->
 <div id="auth-overlay">
-    <div class="spinner" style="width: 50px; height: 50px; border-width: 4px; border-top-color: var(--accent);"></div>
+    <div class="spinner" style="width: 50px; height: 50px; border-width: 4px; border-top-color: var(--accent-cyan);"></div>
     <h3 style="font-weight: 800; font-size: 1.2rem;">جاري التحقق من صلاحيات الدخول...</h3>
 </div>
 
@@ -33,7 +33,7 @@
 <div class="admin-mob-header">
     <div style="display:flex; align-items:center; gap:10px;">
         <img src="logo.png" style="height:32px;">
-        <span style="font-weight:900; font-size:1.1rem; color:var(--primary);">GIZA<span>LAND</span></span>
+        <span style="font-weight:900; font-size:1.1rem; color:var(--text-primary);">GIZA<span style="color:var(--accent-gold);">LAND</span></span>
     </div>
     <button class="admin-mob-btn" onclick="toggleAdminSidebar()"><i class="fa fa-bars"></i></button>
 </div>
@@ -43,13 +43,13 @@
     <!-- Sidebar -->
     <aside class="admin-sidebar" id="adminSidebar">
         <div class="admin-brand">
-            GIZA<span>LAND</span> <span style="font-size: 11px; display:block; opacity:0.7; font-weight:700; margin-top:4px;">لوحة تحكم الإدارة</span>
+            GIZA<span>LAND</span> <span style="font-size: 11px; display:block; opacity:0.7; font-weight:700; margin-top:4px; color:var(--text-secondary);">لوحة تحكم الإدارة</span>
         </div>
         
         <div class="admin-menu">
             <button class="admin-menu-btn active" id="btnSecStats" onclick="showAdminSection('stats')">
                 <i class="fa fa-chart-line"></i> الإحصائيات العامة
-            </</button>
+            </button>
             <button class="admin-menu-btn" id="btnSecActive" onclick="showAdminSection('active')">
                 <i class="fa fa-home"></i> العقارات النشطة
             </button>
@@ -80,7 +80,7 @@
                 <h2 id="adminWelcomeTitle">مرحباً، الأدمن</h2>
                 <p>إدارة كاملة لعقارات وطلبات محافظة الجيزة</p>
             </div>
-            <div style="font-weight:700; color:var(--text-muted); font-size:0.95rem;" id="currentDate">
+            <div style="font-weight:700; color:var(--text-secondary); font-size:0.95rem;" id="currentDate">
                 <!-- Date loaded dynamically -->
             </div>
         </header>
@@ -98,7 +98,7 @@
                 <div class="stat-card">
                     <div class="stat-info">
                         <h3>طلبات بانتظار الموافقة</h3>
-                        <div class="stat-value" id="statTotalPending" style="color:var(--accent);">0</div>
+                        <div class="stat-value" id="statTotalPending" style="color:var(--accent-gold);">0</div>
                     </div>
                     <div class="stat-icon"><i class="fa fa-hourglass-half"></i></div>
                 </div>

@@ -154,7 +154,7 @@ function renderActiveTable() {
                 <td>${locName}</td>
                 <td>${catName}</td>
                 <td><span class="status-badge ${dealClass}">${dealType}</span></td>
-                <td style="color:var(--accent); font-weight:800;">${Number(p.price).toLocaleString()} ج.م</td>
+                <td style="color:var(--accent-gold); font-weight:800;">${Number(p.price).toLocaleString()} ج.م</td>
                 <td>
                     <div class="table-actions">
                         <button class="btn-table-action edit" onclick="editProperty('${p.id}')"><i class="fa fa-edit"></i> تعديل</button>
@@ -195,7 +195,7 @@ function renderPendingTable() {
                 <td><img src="${mainImg}" class="table-img"></td>
                 <td style="font-weight:800; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${p.title}">${p.title}</td>
                 <td>${locName}</td>
-                <td style="color:var(--accent); font-weight:800;">${Number(p.price).toLocaleString()} ج.م</td>
+                <td style="color:var(--accent-gold); font-weight:800;">${Number(p.price).toLocaleString()} ج.م</td>
                 <td>${p.contactName}</td>
                 <td><a href="https://wa.me/${p.contactPhone}" target="_blank" style="color:var(--whatsapp); text-decoration:none; font-weight:800;"><i class="fa-brands fa-whatsapp"></i> ${p.contactPhone}</a></td>
                 <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${p.description}">${p.description}</td>
@@ -215,7 +215,7 @@ function renderPendingTable() {
                 <td><img src="${mainImg}" class="table-img"></td>
                 <td style="font-weight:800; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.title}</td>
                 <td>${locName}</td>
-                <td style="color:var(--accent); font-weight:800;">${Number(p.price).toLocaleString()} ج.م</td>
+                <td style="color:var(--accent-gold); font-weight:800;">${Number(p.price).toLocaleString()} ج.م</td>
                 <td>${p.contactName}</td>
                 <td><a href="https://wa.me/${p.contactPhone}" target="_blank" style="color:var(--whatsapp);"><i class="fa-brands fa-whatsapp"></i> تواصل</a></td>
                 <td>
@@ -374,7 +374,7 @@ window.handleAdminImageSelection = async function(e) {
         thumb.id = thumbId;
         thumb.innerHTML = `
             <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.05);">
-                <div class="spinner" style="border-color:rgba(0,0,0,0.1); border-top-color:var(--accent);"></div>
+                <div class="spinner" style="border-color:rgba(0,0,0,0.1); border-top-color:var(--accent-cyan);"></div>
             </div>
         `;
         container.appendChild(thumb);

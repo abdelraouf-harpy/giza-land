@@ -1,4 +1,4 @@
-const GIZA_CONFIG = {
+var GIZA_CONFIG = window.GIZA_CONFIG = {
     name: "Giza Land",
     mapCenter: [30.0130, 31.2088],
     zoom: 11,
