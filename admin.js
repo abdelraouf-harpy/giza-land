@@ -341,8 +341,8 @@ function initAdminMap(center) {
     // Delay slightly to allow container to render
     setTimeout(() => {
         if (!adminMap) {
-            adminMap = L.map('admin-modal-map').setView(center, GIZA_CONFIG.zoom);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(adminMap);
+            adminMap = L.map('admin-modal-map', { attributionControl: false }).setView(center, GIZA_CONFIG.zoom);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(adminMap);
             
             adminMap.on('click', function(e) {
                 setAdminLocationPin(e.latlng.lat, e.latlng.lng);
@@ -667,7 +667,10 @@ window.seedSamplePropertiesFromAdmin = async function() {
             beds: 3,
             baths: 2,
             description: "شقة سوبر لوكس واجهة ممتازة في البوابة الثانية حدائق الأهرام، قريبة من الخدمات والمدرسة الأوربية.",
-            images: ["images/1.jpg", "images/2.jpg"],
+            images: [
+                "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop"
+            ],
             lat: 29.9863,
             lng: 31.1124,
             status: "active",
@@ -685,7 +688,10 @@ window.seedSamplePropertiesFromAdmin = async function() {
             beds: 5,
             baths: 4,
             description: "فيلا مستقلة تشطيب ألترا سوبر لوكس مع حديقة ومسبح خاص في أرقى كمبوند بالشيخ زايد.",
-            images: ["images/3.jpg", "images/4.jpg"],
+            images: [
+                "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&auto=format&fit=crop"
+            ],
             lat: 30.0468,
             lng: 30.9739,
             status: "active",
@@ -703,7 +709,10 @@ window.seedSamplePropertiesFromAdmin = async function() {
             beds: 0,
             baths: 1,
             description: "مكتب إداري متشطب ومكيف بالكامل يطل على شارع جامعة الدول العربية مباشرة.",
-            images: ["images/2.jpg", "images/1.jpg"],
+            images: [
+                "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=800&auto=format&fit=crop"
+            ],
             lat: 30.0614,
             lng: 31.2012,
             status: "active",
@@ -721,7 +730,10 @@ window.seedSamplePropertiesFromAdmin = async function() {
             beds: 2,
             baths: 2,
             description: "شقة للإيجار المفروش أو قانون جديد، دور متوسط، مصعد شغال، قريبة من مترو الدقي.",
-            images: ["images/4.jpg", "images/2.jpg"],
+            images: [
+                "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop"
+            ],
             lat: 30.0384,
             lng: 31.2114,
             status: "active",
@@ -739,7 +751,10 @@ window.seedSamplePropertiesFromAdmin = async function() {
             beds: 0,
             baths: 1,
             description: "محل تجاري واجهة عريضة على شارع الهرم الرئيسي، موقع ممتاز بجوار كبرى العلامات التجارية.",
-            images: ["images/1.jpg", "images/3.jpg"],
+            images: [
+                "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=800&auto=format&fit=crop"
+            ],
             lat: 30.0074,
             lng: 31.1712,
             status: "active",
@@ -757,7 +772,10 @@ window.seedSamplePropertiesFromAdmin = async function() {
             beds: 4,
             baths: 3,
             description: "تاون هاوس للبيع بـ 6 أكتوبر بالتقسيط المريح، في كمبوند متكامل الخدمات مع أمن وحراسة.",
-            images: ["images/2.jpg", "images/4.jpg"],
+            images: [
+                "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&auto=format&fit=crop"
+            ],
             lat: 29.9723,
             lng: 30.9419,
             status: "active",
@@ -775,7 +793,10 @@ window.seedSamplePropertiesFromAdmin = async function() {
             beds: 3,
             baths: 3,
             description: "شقة داخل فيلا راقية بالحي الدبلوماسي بالشيخ زايد، قريبة من هايبر وان ومول العرب.",
-            images: ["images/1.jpg", "images/3.jpg"],
+            images: [
+                "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1560185007-c5ca9d2c014d?w=800&auto=format&fit=crop"
+            ],
             lat: 30.0520,
             lng: 30.9810,
             status: "active",
@@ -793,7 +814,10 @@ window.seedSamplePropertiesFromAdmin = async function() {
             beds: 0,
             baths: 1,
             description: "محل تجاري للإيجار متشطب وجاهز للتشغيل فوراً، موقع حيوي جداً في شارع فيصل الرئيسي.",
-            images: ["images/2.jpg", "images/4.jpg"],
+            images: [
+                "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=800&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=800&auto=format&fit=crop"
+            ],
             lat: 30.0120,
             lng: 31.1550,
             status: "active",
@@ -811,7 +835,10 @@ window.seedSamplePropertiesFromAdmin = async function() {
             beds: 18,
             baths: 12,
             description: "عمارة سكنية للبيع بالكامل بالوراق، تتكون من 6 طوابق، تشطيب خارجي مميز ومدخل رخام.",
-            images: ["images/4.jpg", "images/1.jpg"],
+            images: [
+                "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop"
+            ],
             lat: 30.1150,
             lng: 31.2050,
             status: "active",
@@ -829,7 +856,10 @@ window.seedSamplePropertiesFromAdmin = async function() {
             beds: 0,
             baths: 0,
             description: "أرض فضاء للبيع بترخيص تجاري/إداري مميز، موقع استراتيجي في التوسعات الشمالية بـ 6 أكتوبر.",
-            images: ["images/3.jpg", "images/2.jpg"],
+            images: [
+                "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800&auto=format&fit=crop"
+            ],
             lat: 29.9550,
             lng: 30.9150,
             status: "active",
@@ -847,7 +877,10 @@ window.seedSamplePropertiesFromAdmin = async function() {
             beds: 3,
             baths: 2,
             description: "شقة للبيع تشطيب كامل الترا سوبر لوكس، تطل على ميدان الجيزة الرئيسي وقريبة من المترو.",
-            images: ["images/1.jpg", "images/4.jpg"],
+            images: [
+                "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop"
+            ],
             lat: 30.0100,
             lng: 31.2120,
             status: "active",
@@ -865,7 +898,10 @@ window.seedSamplePropertiesFromAdmin = async function() {
             beds: 0,
             baths: 1,
             description: "مكتب إداري للبيع بموقع حيوي جداً في الدقي، تشطيب كامل بالتكييفات والأثاث المكتبي الفاخر.",
-            images: ["images/2.jpg", "images/3.jpg"],
+            images: [
+                "https://images.unsplash.com/photo-1497215842964-222b430db094?w=800&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&auto=format&fit=crop"
+            ],
             lat: 30.0350,
             lng: 31.2080,
             status: "active",
