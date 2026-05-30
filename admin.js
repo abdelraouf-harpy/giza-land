@@ -54,6 +54,11 @@ function loadFormDropdowns() {
             locSelect.innerHTML += `<option value="${loc.id}">${loc.name}</option>`;
         });
     }
+    
+    // Initialize custom selects in Admin
+    createCustomSelect('adType');
+    createCustomSelect('adCategory');
+    createCustomSelect('adLocation');
 }
 
 // Switch Sections
@@ -145,7 +150,7 @@ function renderActiveTable() {
         const dealType = p.type === 'sale' ? 'للبيع' : 'للإيجار';
         const dealClass = p.type === 'sale' ? 'active' : 'pending'; // visually distinct badge styles
 
-        const mainImg = Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : '1.jpg';
+        const mainImg = Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : 'images/1.jpg';
 
         tbody.innerHTML += `
             <tr>
@@ -188,7 +193,7 @@ function renderPendingTable() {
     pendingList.forEach(p => {
         const locObj = GIZA_CONFIG.locations.ar.find(l => l.id === p.location);
         const locName = locObj ? locObj.name : p.location;
-        const mainImg = Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : '1.jpg';
+        const mainImg = Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : 'images/1.jpg';
 
         const rowHtml = `
             <tr>
@@ -269,6 +274,11 @@ window.openAddAdminForm = function() {
     document.getElementById('adImagePreviews').innerHTML = '';
     adminUploadedImages = [];
     
+    // Sync custom selects
+    createCustomSelect('adType');
+    createCustomSelect('adCategory');
+    createCustomSelect('adLocation');
+    
     showAdminSection('add');
     initAdminMap(GIZA_CONFIG.mapCenter);
 };
@@ -289,6 +299,12 @@ window.editProperty = function(id) {
     document.getElementById('adType').value = p.type || 'sale';
     document.getElementById('adCategory').value = p.category || '';
     document.getElementById('adLocation').value = p.location || '';
+    
+    // Sync custom selects
+    createCustomSelect('adType');
+    createCustomSelect('adCategory');
+    createCustomSelect('adLocation');
+    
     document.getElementById('adPrice').value = p.price || '';
     document.getElementById('adArea').value = p.area || '';
     document.getElementById('adBeds').value = p.beds || '';
@@ -331,6 +347,19 @@ function initAdminMap(center) {
             adminMap.on('click', function(e) {
                 setAdminLocationPin(e.latlng.lat, e.latlng.lng);
             });
+            
+            // Add Geocoder Search Control to the top-right of admin map
+            L.Control.geocoder({
+                defaultMarkGeocode: false,
+                placeholder: 'ابحث عن منطقة...',
+                position: 'topright'
+            })
+            .on('markgeocode', function(e) {
+                const centerLoc = e.geocode.center;
+                adminMap.setView(centerLoc, 15);
+                setAdminLocationPin(centerLoc.lat, centerLoc.lng);
+            })
+            .addTo(adminMap);
         } else {
             adminMap.invalidateSize();
             adminMap.setView(center, GIZA_CONFIG.zoom);
@@ -509,3 +538,105 @@ function showToast(msg, type = 'success') {
         t.remove();
     }, 4000);
 }
+
+// Vanilla JS Custom Select Dropdown helper for Admin Page
+function createCustomSelect(selectId, placeholderStr = '') {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    
+    // Check if already initialized and remove wrapper to recreate it fresh
+    const existingWrapper = select.parentElement.querySelector('.custom-select-wrapper');
+    if (existingWrapper) {
+        existingWrapper.remove();
+    }
+    
+    // Hide native select
+    select.style.display = 'none';
+    
+    const wrapper = document.createElement('div');
+    wrapper.className = 'custom-select-wrapper';
+    
+    const trigger = document.createElement('div');
+    trigger.className = 'custom-select-trigger';
+    trigger.innerHTML = `
+        <span class="select-trigger-text"></span>
+        <i class="fa fa-chevron-down select-chevron"></i>
+    `;
+    
+    const dropdown = document.createElement('div');
+    dropdown.className = 'custom-select-dropdown';
+    
+    const searchContainer = document.createElement('div');
+    searchContainer.className = 'select-search-box';
+    searchContainer.innerHTML = `
+        <i class="fa fa-search search-icon"></i>
+        <input type="text" placeholder="بحث...">
+    `;
+    
+    const list = document.createElement('ul');
+    list.className = 'select-options-list';
+    
+    dropdown.appendChild(searchContainer);
+    dropdown.appendChild(list);
+    wrapper.appendChild(trigger);
+    wrapper.appendChild(dropdown);
+    
+    select.parentElement.appendChild(wrapper);
+    
+    // Populate options list
+    function updateOptions() {
+        list.innerHTML = '';
+        const searchVal = searchContainer.querySelector('input').value.toLowerCase();
+        
+        Array.from(select.options).forEach(opt => {
+            if (opt.text.toLowerCase().includes(searchVal)) {
+                const li = document.createElement('li');
+                li.className = 'select-option-item';
+                if (opt.selected) {
+                    li.classList.add('selected');
+                    trigger.querySelector('.select-trigger-text').innerText = opt.text;
+                }
+                li.innerText = opt.text;
+                li.onclick = function(e) {
+                    e.stopPropagation();
+                    select.value = opt.value;
+                    select.dispatchEvent(new Event('change'));
+                    updateOptions();
+                    wrapper.classList.remove('open');
+                };
+                list.appendChild(li);
+            }
+        });
+    }
+    
+    // Event listeners
+    trigger.onclick = function(e) {
+        e.stopPropagation();
+        // Close all other custom selects first
+        document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+            if (w !== wrapper) w.classList.remove('open');
+        });
+        wrapper.classList.toggle('open');
+        if (wrapper.classList.contains('open')) {
+            searchContainer.querySelector('input').focus();
+        }
+    };
+    
+    searchContainer.querySelector('input').oninput = function() {
+        updateOptions();
+    };
+    
+    searchContainer.querySelector('input').onclick = function(e) {
+        e.stopPropagation();
+    };
+    
+    // Initial populate
+    updateOptions();
+}
+
+// Global click listener to close custom select dropdowns when clicking outside
+document.addEventListener('click', function() {
+    document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+        w.classList.remove('open');
+    });
+});
