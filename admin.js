@@ -35,6 +35,7 @@ window.toggleAdminSidebar = function() {
 async function initAdminDashboard() {
     loadFormDropdowns();
     await fetchAllAdminProperties();
+    await fetchAllAdminReviews();
 }
 
 // Load categories & locations in the form from config
@@ -66,14 +67,14 @@ window.showAdminSection = function(secId) {
     activeSection = secId;
     
     // Switch active buttons styling
-    const btns = ['Stats', 'Active', 'Pending', 'Add'];
+    const btns = ['Stats', 'Active', 'Pending', 'Add', 'Reviews'];
     btns.forEach(b => {
         const el = document.getElementById(`btnSec${b}`);
         if (el) el.classList.toggle('active', b.toLowerCase() === secId.toLowerCase());
     });
 
     // Switch active section visibility
-    const sections = ['stats', 'active', 'pending', 'add'];
+    const sections = ['stats', 'active', 'pending', 'add', 'reviews'];
     sections.forEach(s => {
         const el = document.getElementById(`sec-${s}`);
         if (el) el.classList.toggle('active', s === secId);
@@ -929,3 +930,64 @@ window.seedSamplePropertiesFromAdmin = async function() {
     }
 };
 
+
+
+// ─── Customer Reviews Administration ───
+let allAdminReviews = [];
+
+async function fetchAllAdminReviews() {
+    try {
+        const snap = await db.collection('reviews')
+            .orderBy('createdAt', 'desc')
+            .get();
+        
+        allAdminReviews = [];
+        snap.forEach(doc => {
+            allAdminReviews.push({ id: doc.id, ...doc.data() });
+        });
+        
+        renderReviewsTable();
+    } catch (e) {
+        console.error("Error loading reviews:", e);
+    }
+}
+
+function renderReviewsTable() {
+    const tbody = document.getElementById('reviewsTableBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    if (allAdminReviews.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">لا توجد تقييمات عملاء حالياً.</td></tr>`;
+        return;
+    }
+    
+    allAdminReviews.forEach(rev => {
+        const ratingStars = '⭐'.repeat(rev.rating || 5);
+        tbody.innerHTML += `
+            <tr>
+                <td style="font-weight:700;">${rev.name}</td>
+                <td>${rev.location || 'غير محدد'}</td>
+                <td style="color:var(--accent-gold);">${ratingStars}</td>
+                <td style="max-width:300px; word-wrap:break-word; white-space:normal; line-height:1.5;">${rev.comment}</td>
+                <td>
+                    <div class="table-actions">
+                        <button class="btn-table-action reject" onclick="deleteReview('${rev.id}')"><i class="fa fa-trash"></i> حذف التقييم</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+window.deleteReview = async function(id) {
+    if (!confirm("هل أنت متأكد من حذف هذا التقييم نهائياً؟")) return;
+    try {
+        await db.collection('reviews').doc(id).delete();
+        showToast("تم حذف التقييم بنجاح! 🗑️");
+        await fetchAllAdminReviews();
+    } catch (e) {
+        console.error("Delete review error:", e);
+        showToast("فشل حذف التقييم.", "error");
+    }
+};

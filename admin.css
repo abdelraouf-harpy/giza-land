@@ -28,6 +28,7 @@
     box-sizing: border-box;
     font-family: 'Cairo', sans-serif;
     scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
