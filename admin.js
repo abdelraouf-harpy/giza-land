@@ -640,3 +640,256 @@ document.addEventListener('click', function() {
         w.classList.remove('open');
     });
 });
+
+// Seed sample properties directly from Admin Panel
+window.seedSamplePropertiesFromAdmin = async function() {
+    if (!confirm("هل تريد توليد 12 عقاراً تجريبياً نشطاً (شقق، فلل، مكاتب، محلات، إلخ) لعرضها فوراً في الموقع؟")) return;
+    
+    // Disable button to prevent double-clicks
+    const btn = document.querySelector('[onclick="seedSamplePropertiesFromAdmin()"]');
+    let originalText = "";
+    if (btn) {
+        originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa fa-spinner fa-spin"></i> جاري توليد البيانات...`;
+    }
+    
+    const mockProps = [
+        {
+            title: "شقة فاخرة للبيع في حدائق الأهرام",
+            contactName: "مكتب البستان العقاري",
+            contactPhone: "201113453475",
+            type: "sale",
+            category: "apartment",
+            location: "hadayek_ahram",
+            price: 2600000,
+            area: 175,
+            beds: 3,
+            baths: 2,
+            description: "شقة سوبر لوكس واجهة ممتازة في البوابة الثانية حدائق الأهرام، قريبة من الخدمات والمدرسة الأوربية.",
+            images: ["images/1.jpg", "images/2.jpg"],
+            lat: 29.9863,
+            lng: 31.1124,
+            status: "active",
+            createdAt: new Date().toISOString()
+        },
+        {
+            title: "فيلا مستقلة رائعة مع مسبح خاص بالشيخ زايد",
+            contactName: "زايد هومز",
+            contactPhone: "201113453475",
+            type: "sale",
+            category: "villa",
+            location: "sheikh_zayed",
+            price: 11500000,
+            area: 420,
+            beds: 5,
+            baths: 4,
+            description: "فيلا مستقلة تشطيب ألترا سوبر لوكس مع حديقة ومسبح خاص في أرقى كمبوند بالشيخ زايد.",
+            images: ["images/3.jpg", "images/4.jpg"],
+            lat: 30.0468,
+            lng: 30.9739,
+            status: "active",
+            createdAt: new Date().toISOString()
+        },
+        {
+            title: "مكتب إداري مجهز بالكامل للإيجار بالمهندسين",
+            contactName: "جيزة بيزنس",
+            contactPhone: "201113453475",
+            type: "rent",
+            category: "office",
+            location: "mohandessin",
+            price: 35000,
+            area: 110,
+            beds: 0,
+            baths: 1,
+            description: "مكتب إداري متشطب ومكيف بالكامل يطل على شارع جامعة الدول العربية مباشرة.",
+            images: ["images/2.jpg", "images/1.jpg"],
+            lat: 30.0614,
+            lng: 31.2012,
+            status: "active",
+            createdAt: new Date().toISOString()
+        },
+        {
+            title: "شقة للإيجار قانون جديد في الدقي",
+            contactName: "إيليت بروبرتيز",
+            contactPhone: "201113453475",
+            type: "rent",
+            category: "apartment",
+            location: "dokki",
+            price: 18000,
+            area: 140,
+            beds: 2,
+            baths: 2,
+            description: "شقة للإيجار المفروش أو قانون جديد، دور متوسط، مصعد شغال، قريبة من مترو الدقي.",
+            images: ["images/4.jpg", "images/2.jpg"],
+            lat: 30.0384,
+            lng: 31.2114,
+            status: "active",
+            createdAt: new Date().toISOString()
+        },
+        {
+            title: "محل تجاري للبيع موقع حيوي في الهرم",
+            contactName: "الوكيل العقاري",
+            contactPhone: "201113453475",
+            type: "sale",
+            category: "store",
+            location: "haram",
+            price: 5200000,
+            area: 65,
+            beds: 0,
+            baths: 1,
+            description: "محل تجاري واجهة عريضة على شارع الهرم الرئيسي، موقع ممتاز بجوار كبرى العلامات التجارية.",
+            images: ["images/1.jpg", "images/3.jpg"],
+            lat: 30.0074,
+            lng: 31.1712,
+            status: "active",
+            createdAt: new Date().toISOString()
+        },
+        {
+            title: "تاون هاوس راقي للبيع في 6 أكتوبر",
+            contactName: "أكتوبر إستيت",
+            contactPhone: "201113453475",
+            type: "sale",
+            category: "townhouse",
+            location: "october",
+            price: 8900000,
+            area: 260,
+            beds: 4,
+            baths: 3,
+            description: "تاون هاوس للبيع بـ 6 أكتوبر بالتقسيط المريح، في كمبوند متكامل الخدمات مع أمن وحراسة.",
+            images: ["images/2.jpg", "images/4.jpg"],
+            lat: 29.9723,
+            lng: 30.9419,
+            status: "active",
+            createdAt: new Date().toISOString()
+        },
+        {
+            title: "شقة بفيلا مميزة للإيجار في الشيخ زايد",
+            contactName: "اليمامة للتسويق",
+            contactPhone: "201113453475",
+            type: "rent",
+            category: "apartment",
+            location: "sheikh_zayed",
+            price: 22000,
+            area: 180,
+            beds: 3,
+            baths: 3,
+            description: "شقة داخل فيلا راقية بالحي الدبلوماسي بالشيخ زايد، قريبة من هايبر وان ومول العرب.",
+            images: ["images/1.jpg", "images/3.jpg"],
+            lat: 30.0520,
+            lng: 30.9810,
+            status: "active",
+            createdAt: new Date().toISOString()
+        },
+        {
+            title: "محل تجاري للإيجار في شارع فيصل الرئيسي",
+            contactName: "الوسيط العقاري",
+            contactPhone: "201113453475",
+            type: "rent",
+            category: "store",
+            location: "faisal",
+            price: 25000,
+            area: 80,
+            beds: 0,
+            baths: 1,
+            description: "محل تجاري للإيجار متشطب وجاهز للتشغيل فوراً، موقع حيوي جداً في شارع فيصل الرئيسي.",
+            images: ["images/2.jpg", "images/4.jpg"],
+            lat: 30.0120,
+            lng: 31.1550,
+            status: "active",
+            createdAt: new Date().toISOString()
+        },
+        {
+            title: "عمارة سكنية كاملة للبيع في الوراق",
+            contactName: "مجموعة النيل للاستثمار",
+            contactPhone: "201113453475",
+            type: "sale",
+            category: "building",
+            location: "warraq",
+            price: 14500000,
+            area: 900,
+            beds: 18,
+            baths: 12,
+            description: "عمارة سكنية للبيع بالكامل بالوراق، تتكون من 6 طوابق، تشطيب خارجي مميز ومدخل رخام.",
+            images: ["images/4.jpg", "images/1.jpg"],
+            lat: 30.1150,
+            lng: 31.2050,
+            status: "active",
+            createdAt: new Date().toISOString()
+        },
+        {
+            title: "أرض فضاء تجارية مميزة للبيع في 6 أكتوبر",
+            contactName: "أكتوبر لاند",
+            contactPhone: "201113453475",
+            type: "sale",
+            category: "land",
+            location: "october",
+            price: 18000000,
+            area: 1200,
+            beds: 0,
+            baths: 0,
+            description: "أرض فضاء للبيع بترخيص تجاري/إداري مميز، موقع استراتيجي في التوسعات الشمالية بـ 6 أكتوبر.",
+            images: ["images/3.jpg", "images/2.jpg"],
+            lat: 29.9550,
+            lng: 30.9150,
+            status: "active",
+            createdAt: new Date().toISOString()
+        },
+        {
+            title: "شقة كاملة المرافق للبيع في ميدان الجيزة",
+            contactName: "وكيل جيزة لاند",
+            contactPhone: "201113453475",
+            type: "sale",
+            category: "apartment",
+            location: "giza_square",
+            price: 3200000,
+            area: 150,
+            beds: 3,
+            baths: 2,
+            description: "شقة للبيع تشطيب كامل الترا سوبر لوكس، تطل على ميدان الجيزة الرئيسي وقريبة من المترو.",
+            images: ["images/1.jpg", "images/4.jpg"],
+            lat: 30.0100,
+            lng: 31.2120,
+            status: "active",
+            createdAt: new Date().toISOString()
+        },
+        {
+            title: "مكتب إداري فاخر للبيع في الدقي",
+            contactName: "الدقي هومز",
+            contactPhone: "201113453475",
+            type: "sale",
+            category: "office",
+            location: "dokki",
+            price: 6800000,
+            area: 95,
+            beds: 0,
+            baths: 1,
+            description: "مكتب إداري للبيع بموقع حيوي جداً في الدقي، تشطيب كامل بالتكييفات والأثاث المكتبي الفاخر.",
+            images: ["images/2.jpg", "images/3.jpg"],
+            lat: 30.0350,
+            lng: 31.2080,
+            status: "active",
+            createdAt: new Date().toISOString()
+        }
+    ];
+
+    try {
+        let count = 0;
+        for (const prop of mockProps) {
+            await db.collection('properties').add(prop);
+            count++;
+        }
+        showToast(`تم توليد ${count} عقاراً تجريبياً بنجاح! 🚀`);
+        await fetchAllAdminProperties();
+        showAdminSection('stats');
+    } catch (e) {
+        console.error("Failed to seed:", e);
+        showToast("حدث خطأ أثناء توليد العقارات التجريبية.", "error");
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+};
+
