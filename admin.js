@@ -342,7 +342,7 @@ function initAdminMap(center) {
     setTimeout(() => {
         if (!adminMap) {
             adminMap = L.map('admin-modal-map').setView(center, GIZA_CONFIG.zoom);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(adminMap);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(adminMap);
             
             adminMap.on('click', function(e) {
                 setAdminLocationPin(e.latlng.lat, e.latlng.lng);
