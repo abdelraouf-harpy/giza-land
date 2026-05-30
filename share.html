@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- These will be replaced dynamically by JavaScript before redirect -->
+    <!-- But search engines / OG crawlers see these defaults -->
+    <title id="page-title">جيزة لاند | عقار مميز للبيع أو الإيجار بمحافظة الجيزة</title>
+    <meta name="description" id="page-desc" content="تصفح هذا العقار المميز على منصة جيزة لاند - المنصة العقارية الرائدة في محافظة الجيزة.">
+
+    <!-- Open Graph - will be overridden by JS, but bots read the static default -->
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="جيزة لاند | Giza Land">
+    <meta property="og:title" id="og-title" content="عقار مميز على جيزة لاند">
+    <meta property="og:description" id="og-desc" content="تصفح هذا العقار المميز على منصة جيزة لاند - المنصة العقارية الرائدة في محافظة الجيزة.">
+    <meta property="og:image" id="og-image" content="https://gizaland.com/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" id="og-url" content="https://gizaland.com/">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" id="tw-image" content="https://gizaland.com/og-image.png">
+    <meta name="twitter:title" id="tw-title" content="عقار مميز على جيزة لاند">
+    <meta name="twitter:description" id="tw-desc" content="تصفح هذا العقار المميز على منصة جيزة لاند.">
+
+    <style>
+        body {
+            margin: 0;
+            background: #0D0D12;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: 'Cairo', sans-serif;
+            color: white;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(212,175,55,0.2);
+            border-top-color: #D4AF37;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        p { color: rgba(255,255,255,0.6); font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="spinner"></div>
+    <p>جاري تحميل تفاصيل العقار...</p>
+
+    <script>
+    // Read URL params
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const propId  = params.get('prop');
+        const imgUrl  = params.get('img');   // property image URL (URL-encoded)
+        const title   = params.get('title'); // property title (URL-encoded)
+        const price   = params.get('price');
+        const region  = params.get('region');
+
+        // Build a rich title
+        const propTitle = title ? decodeURIComponent(title) : 'عقار مميز على جيزة لاند';
+        const priceText = price ? ' - ' + Number(price).toLocaleString('ar-EG') + ' ج.م' : '';
+        const regionText = region ? ' في ' + decodeURIComponent(region) : ' بمحافظة الجيزة';
+        const fullTitle = propTitle + priceText;
+        const desc = 'تصفح هذا العقار المميز' + regionText + ' على منصة جيزة لاند. عمولة ثابتة 1.5% وتوثيق حي بالبطاقة.';
+
+        // If we have a property image, update og:image
+        const imageUrl = imgUrl ? decodeURIComponent(imgUrl) : 'https://gizaland.com/og-image.png';
+
+        // Update meta tags dynamically (for WhatsApp Web, Telegram etc. that do execute JS)
+        document.getElementById('og-title').setAttribute('content', fullTitle);
+        document.getElementById('og-desc').setAttribute('content', desc);
+        document.getElementById('og-image').setAttribute('content', imageUrl);
+        document.getElementById('og-url').setAttribute('content', 'https://gizaland.com/?prop=' + (propId || ''));
+        document.getElementById('tw-image').setAttribute('content', imageUrl);
+        document.getElementById('tw-title').setAttribute('content', fullTitle);
+        document.getElementById('tw-desc').setAttribute('content', desc);
+        document.getElementById('page-title').textContent = fullTitle + ' | جيزة لاند';
+        document.title = fullTitle + ' | جيزة لاند';
+
+        // Redirect to the main site after brief delay (to allow OG crawlers to read the tags)
+        const redirectTarget = propId
+            ? 'https://gizaland.com/?prop=' + propId
+            : 'https://gizaland.com/';
+
+        // Immediate redirect for real users (crawlers will stop at the meta tags)
+        setTimeout(function() {
+            window.location.replace(redirectTarget);
+        }, 300);
+    })();
+    </script>
+</body>
+</html>
