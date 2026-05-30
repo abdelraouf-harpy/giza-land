@@ -8,7 +8,7 @@ let adminUploadedImages = [];
 // Auth Monitor
 auth.onAuthStateChanged(user => {
     if (!user) {
-        window.location.href = 'index.html';
+        window.location.href = 'index.html?login=true';
     } else {
         // Display admin name
         document.getElementById('adminWelcomeTitle').innerHTML = `مرحباً، ${user.displayName || 'مدير الموقع'}`;
@@ -160,7 +160,7 @@ function renderActiveTable() {
                 <td>${locName}</td>
                 <td>${catName}</td>
                 <td><span class="status-badge ${dealClass}">${dealType}</span></td>
-                <td style="color:var(--accent-gold); font-weight:800;">${Number(p.price).toLocaleString()} ج.م</td>
+                <td style="color:var(--accent-gold); font-weight:800;">${Number(p.price).toLocaleString('en-US')} ج.م</td>
                 <td>
                     <div class="table-actions">
                         <button class="btn-table-action edit" onclick="editProperty('${p.id}')"><i class="fa fa-edit"></i> تعديل</button>
@@ -201,7 +201,7 @@ function renderPendingTable() {
                 <td><img src="${mainImg}" class="table-img"></td>
                 <td style="font-weight:800; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${p.title}">${p.title}</td>
                 <td>${locName}</td>
-                <td style="color:var(--accent-gold); font-weight:800;">${Number(p.price).toLocaleString()} ج.م</td>
+                <td style="color:var(--accent-gold); font-weight:800;">${Number(p.price).toLocaleString('en-US')} ج.م</td>
                 <td>${p.contactName}</td>
                 <td><a href="https://wa.me/${p.contactPhone}" target="_blank" style="color:var(--whatsapp); text-decoration:none; font-weight:800;"><i class="fa-brands fa-whatsapp"></i> ${p.contactPhone}</a></td>
                 <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${p.description}">${p.description}</td>
@@ -221,7 +221,7 @@ function renderPendingTable() {
                 <td><img src="${mainImg}" class="table-img"></td>
                 <td style="font-weight:800; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.title}</td>
                 <td>${locName}</td>
-                <td style="color:var(--accent-gold); font-weight:800;">${Number(p.price).toLocaleString()} ج.م</td>
+                <td style="color:var(--accent-gold); font-weight:800;">${Number(p.price).toLocaleString('en-US')} ج.م</td>
                 <td>${p.contactName}</td>
                 <td><a href="https://wa.me/${p.contactPhone}" target="_blank" style="color:var(--whatsapp);"><i class="fa-brands fa-whatsapp"></i> تواصل</a></td>
                 <td>
